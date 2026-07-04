@@ -1,0 +1,4 @@
+.DS_Store
+*.zwc
+zshrc.secrets.local
+zshenv.secrets.local
