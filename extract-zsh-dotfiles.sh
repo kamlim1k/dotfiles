@@ -219,7 +219,17 @@ FILES=(
   "zpreztorc"
 )
 for name in "${FILES[@]}"; do
-  [ -f "$DOTFILES_DIR/zsh/$name" ] && ln -sf "$DOTFILES_DIR/zsh/$name" "$HOME/.$name"
+  src="$DOTFILES_DIR/zsh/$name"
+  dest="$HOME/.$name"
+  [ -f "$src" ] || continue
+  if [ -L "$dest" ]; then
+    rm -f "$dest"
+  elif [ -e "$dest" ]; then
+    backup="${dest}.bak.$(date +%s)"
+    mv "$dest" "$backup"
+    echo "  ! $dest already existed — backed up to $backup"
+  fi
+  ln -s "$src" "$dest"
 done
 
 echo "==> Symlinking fragment directories"
@@ -232,7 +242,24 @@ DIRS=(
   "zshrc.add-plugins.d"
 )
 for name in "${DIRS[@]}"; do
-  [ -d "$DOTFILES_DIR/zsh/$name" ] && ln -sf "$DOTFILES_DIR/zsh/$name" "$HOME/.$name"
+  src="$DOTFILES_DIR/zsh/$name"
+  dest="$HOME/.$name"
+  [ -d "$src" ] || continue
+  if [ -L "$dest" ]; then
+    # Already a symlink (possibly to somewhere else) — replace it
+    rm -f "$dest"
+  elif [ -d "$dest" ]; then
+    # Real directory already exists (e.g. zqs created it on install) —
+    # ln -s would nest inside it instead of replacing it, so back it up first.
+    backup="${dest}.bak.$(date +%s)"
+    mv "$dest" "$backup"
+    echo "  ! $dest already existed as a real directory — backed up to $backup"
+  elif [ -e "$dest" ]; then
+    backup="${dest}.bak.$(date +%s)"
+    mv "$dest" "$backup"
+    echo "  ! $dest already existed — backed up to $backup"
+  fi
+  ln -s "$src" "$dest"
 done
 
 echo "==> Ensuring ~/.zshenv sources .zshenv.local (for untracked per-machine/secrets overrides)"
