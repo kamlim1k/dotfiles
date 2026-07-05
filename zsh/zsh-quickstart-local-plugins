@@ -61,7 +61,8 @@ bindkey "$terminfo[kcud1]" history-substring-search-down
 zgenom load unixorn/rake-completion.zshplugin
 
 # Automatically run zgenom update and zgenom selfupdate every 7 days.
-zgenom load unixorn/autoupdate-zgenom
+#zgenom load unixorn/autoupdate-zgenom
+zgenom reset
 
 # Add my collection of miscellaneous utility functions.
 zgenom load unixorn/jpb.zshplugin
